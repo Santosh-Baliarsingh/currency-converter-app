@@ -14,8 +14,10 @@ import { TbHelpHexagonFilled } from "react-icons/tb";
 import { AiOutlineSwap } from "react-icons/ai";
 import { MdDarkMode } from "react-icons/md";
 import { MdDangerous } from "react-icons/md";
-import { useEffect, useState , useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
+import { MdLightMode } from "react-icons/md";
 import axios from "axios";
+import dateFormat from "dateformat";
 
 interface ICurrency {
   name: string;
@@ -42,7 +44,9 @@ function App() {
   const [fromCurrencyValue, setFromCurrencyValue] = useState(0);
   const [toCurrencyValue, setToCurrencyValue] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
-  
+  const [darkMode, setDarkMode] = useState(false);
+  const now = new Date();
+
   const apiKey = import.meta.env.VITE_API_KEY;
 
   console.log(countries);
@@ -58,26 +62,29 @@ function App() {
       });
   };
 
-  const convertCurrency = useCallback(async (fromCurrency: string, toCurrency: string) => {
-    try {
-      const response = await axios.get(
-        `https://api.freecurrencyapi.com/v1/latest?apikey=${apiKey}&baseCurrency=${fromCurrency}&targetCurrency=${toCurrency}`
-      );
-  
-      if (response.data.data[toCurrency] === undefined) {
-        setErrorMessage(
-          `The currency ${toCurrency} is not supported by the API. Please select other currencies!`
+  const convertCurrency = useCallback(
+    async (fromCurrency: string, toCurrency: string) => {
+      try {
+        const response = await axios.get(
+          `https://api.freecurrencyapi.com/v1/latest?apikey=${apiKey}&baseCurrency=${fromCurrency}&targetCurrency=${toCurrency}`
         );
-      } else {
-        setErrorMessage("");
+
+        if (response.data.data[toCurrency] === undefined) {
+          setErrorMessage(
+            `The currency ${toCurrency} is not supported by the API. Please select other currencies!`
+          );
+        } else {
+          setErrorMessage("");
+        }
+
+        console.log(response.data.data[toCurrency]);
+        return response.data.data[toCurrency];
+      } catch (error) {
+        setErrorMessage("An error occurred while fetching the currency data.");
       }
-  
-      console.log(response.data.data[toCurrency]);
-      return response.data.data[toCurrency];
-    } catch (error) {
-      setErrorMessage("An error occurred while fetching the currency data.");
-    }
-  }, [apiKey]);
+    },
+    [apiKey]
+  );
 
   useEffect(() => {
     fetchCountryData();
@@ -94,7 +101,7 @@ function App() {
         setToCurrencyValue(parseFloat((rate * fromCurrencyValue).toFixed(4)));
       });
     }
-  }, [selectFromCountry, selectToCountry, fromCurrencyValue , convertCurrency]);
+  }, [selectFromCountry, selectToCountry, fromCurrencyValue, convertCurrency]);
 
   const getFromCurrencySymbol = (countryName: string) => {
     if (countryName === "") {
@@ -153,33 +160,55 @@ function App() {
 
   return (
     <>
-      <Box sx={styles.container}>
-        <Box sx={styles.converterBox}>
+      <Box sx={darkMode ? styles.darkContainer : styles.container}>
+        <Box sx={darkMode ? styles.darkConverterBox : styles.converterBox}>
           <Box sx={styles.sidebar}>
             <Box sx={styles.sidebarBox}>
               <Box sx={styles.logo} component="img" src={logo} />
               <Box sx={styles.helpIcon}>
-                <TbHelpHexagonFilled />
+                <TbHelpHexagonFilled
+                  style={{ color: darkMode ? "#fff" : "" }}
+                />
               </Box>
             </Box>
           </Box>
           <Box sx={styles.appSection}>
             <Box sx={styles.appsectionheadBox}>
               <Box>
-                <Typography sx={styles.appheading}>
+                <Typography
+                  sx={{
+                    ...styles.appheading,
+                    color: darkMode ? "#E5E5E5" : "initial",
+                  }}
+                >
                   Currency Converter
                 </Typography>
-                <Typography>Today , 12.03.2024 18:27</Typography>
+                <Typography sx={{ color: darkMode ? "#E5E5E5" : "#000" }}>
+                  {dateFormat(now, "dddd, dd.mm.yyyy, h:MM TT")}
+                  {/* Today , 12.03.2024 18:27 */}
+                </Typography>
               </Box>
 
-              <Box sx={styles.mode}>
-                <MdDarkMode />
+              <Box onClick={() => setDarkMode(!darkMode)} sx={styles.mode}>
+                {darkMode ? (
+                  <MdLightMode style={{ color: "#fff" }} />
+                ) : (
+                  <MdDarkMode />
+                )}
               </Box>
             </Box>
             <Box sx={styles.selectBox}>
               <Box sx={styles.fromSelect}>
                 <FormControl fullWidth variant="standard">
-                  <InputLabel shrink style={{ fontSize: 20, fontWeight: 600 }}>
+                  <InputLabel
+                    shrink
+                    style={{
+                      fontSize: 20,
+                      fontWeight: 600,
+                      color: darkMode ? "#E5E5E5" : "#000",
+                      borderColor: darkMode ? "#E5E5E5" : "initial",
+                    }}
+                  >
                     From
                   </InputLabel>
                   <Select
@@ -187,10 +216,16 @@ function App() {
                     onChange={(event) =>
                       setSelectFromCountry(event.target.value as string)
                     }
-                    sx={styles.select}
+                    sx={{
+                      ...styles.select,
+                      color: darkMode ? "#E5E5E5" : "initial",
+                      "& .MuiSelect-icon": {
+                        color: darkMode ? "#E5E5E5" : "initial",
+                      },
+                    }}
                   >
                     <MenuItem sx={styles.menuItem} value="Select a country">
-                      Select a country
+                      Select a currency
                     </MenuItem>
                     {countries.map(
                       (country) =>
@@ -226,12 +261,23 @@ function App() {
                   </Select>
                 </FormControl>
               </Box>
-              <Box onClick={handleSwap} sx={styles.swapBtn}>
+              <Box
+                onClick={handleSwap}
+                sx={{ ...styles.swapBtn, color: darkMode ? "#E5E5E5" : "#000" }}
+              >
                 <AiOutlineSwap />
               </Box>
               <Box sx={styles.toSelect}>
                 <FormControl fullWidth variant="standard">
-                  <InputLabel shrink style={{ fontSize: 20, fontWeight: 600 }}>
+                  <InputLabel
+                    shrink
+                    style={{
+                      fontSize: 20,
+                      fontWeight: 600,
+                      color: darkMode ? "#E5E5E5" : "#000",
+                      borderColor: darkMode ? "#E5E5E5" : "initial",
+                    }}
+                  >
                     To
                   </InputLabel>
                   <Select
@@ -239,10 +285,16 @@ function App() {
                     onChange={(event) =>
                       setSelectToCountry(event.target.value as string)
                     }
-                    sx={styles.select}
+                    sx={{
+                      ...styles.select,
+                      color: darkMode ? "#E5E5E5" : "initial",
+                      "& .MuiSelect-icon": {
+                        color: darkMode ? "#E5E5E5" : "initial",
+                      },
+                    }}
                   >
                     <MenuItem sx={styles.menuItem} value="Select a country">
-                      Select a country
+                      Select a currency
                     </MenuItem>
                     {countries.map(
                       (country) =>
@@ -293,7 +345,13 @@ function App() {
                     startAdornment: (
                       <InputAdornment position="start">
                         <Typography
-                          sx={{ fontSize: { xs: "40px", md: "70px" } }}
+                          sx={{
+                            fontSize: {
+                              xs: "40px",
+                              md: "70px",
+                              color: darkMode ? "#E5E5E5" : "initial",
+                            },
+                          }}
                         >
                           {getFromCurrencySymbol(selectFromCountry)}
                         </Typography>
@@ -303,6 +361,7 @@ function App() {
                       border: "none",
                       fontSize: { xs: "30px", md: "50px" },
                       cursor: "text",
+                      color: darkMode ? "#E5E5E5" : "initial",
                     },
                   }}
                   fullWidth
@@ -324,7 +383,13 @@ function App() {
                     startAdornment: (
                       <InputAdornment position="start">
                         <Typography
-                          sx={{ fontSize: { xs: "40px", md: "70px" } }}
+                          sx={{
+                            fontSize: {
+                              xs: "40px",
+                              md: "70px",
+                              color: darkMode ? "#E5E5E5" : "initial",
+                            },
+                          }}
                         >
                           {getToCurrencySymbol(selectToCountry)}
                         </Typography>
@@ -334,6 +399,7 @@ function App() {
                       border: "none",
                       fontSize: { xs: "30px", md: "50px" },
                       cursor: "text",
+                      color: darkMode ? "#E5E5E5" : "initial",
                     },
                   }}
                   fullWidth
@@ -343,8 +409,20 @@ function App() {
             </Box>
             {errorMessage && (
               <Box sx={styles.errorBox}>
-                <MdDangerous style={{ color: "red", fontSize: "25px" }} />
-                <Typography sx={styles.error}>{errorMessage}</Typography>
+                <MdDangerous
+                  style={{
+                    color: darkMode ? "orange" : "red",
+                    fontSize: "25px",
+                  }}
+                />
+                <Typography
+                  sx={{
+                    ...styles.error,
+                    color: darkMode ? "orange" : "red",
+                  }}
+                >
+                  {errorMessage}
+                </Typography>
               </Box>
             )}
           </Box>
