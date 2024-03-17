@@ -39,8 +39,8 @@ interface ICountry {
 function App() {
   const [countries, setCountries] = useState<ICountry[]>([]);
   const [selectFromCountry, setSelectFromCountry] =
-    useState("Select a country");
-  const [selectToCountry, setSelectToCountry] = useState("Select a country");
+    useState("Select a currency");
+  const [selectToCountry, setSelectToCountry] = useState("Select a currency");
   const [fromCurrencyValue, setFromCurrencyValue] = useState(0);
   const [toCurrencyValue, setToCurrencyValue] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
@@ -50,6 +50,8 @@ function App() {
   const apiKey = import.meta.env.VITE_API_KEY;
 
   console.log(countries);
+  console.log("selected Currency", selectFromCountry);
+  console.log("From Currency Values", fromCurrencyValue);
 
   const fetchCountryData = async () => {
     await axios
@@ -64,9 +66,11 @@ function App() {
 
   const convertCurrency = useCallback(
     async (fromCurrency: string, toCurrency: string) => {
+      console.log("fromCurrency", fromCurrency);
+      console.log("toCurrency", toCurrency);
       try {
         const response = await axios.get(
-          `https://api.freecurrencyapi.com/v1/latest?apikey=${apiKey}&baseCurrency=${fromCurrency}&targetCurrency=${toCurrency}`
+          `https://api.freecurrencyapi.com/v1/latest?apikey=${apiKey}&base_currency=${fromCurrency}&currencies=${toCurrency}`
         );
 
         if (response.data.data[toCurrency] === undefined) {
@@ -77,7 +81,7 @@ function App() {
           setErrorMessage("");
         }
 
-        console.log(response.data.data[toCurrency]);
+        console.log("response", response.data.data[toCurrency]);
         return response.data.data[toCurrency];
       } catch (error) {
         setErrorMessage("An error occurred while fetching the currency data.");
@@ -92,8 +96,8 @@ function App() {
 
   useEffect(() => {
     if (
-      selectFromCountry !== "Select a country" &&
-      selectToCountry !== "Select a country"
+      selectFromCountry !== "Select a currency" &&
+      selectToCountry !== "Select a currency"
     ) {
       const fromCurrency = selectFromCountry.split(" - ")[1];
       const toCurrency = selectToCountry.split(" - ")[1];
@@ -185,7 +189,6 @@ function App() {
                 </Typography>
                 <Typography sx={{ color: darkMode ? "#E5E5E5" : "#000" }}>
                   {dateFormat(now, "dddd, dd.mm.yyyy, h:MM TT")}
-                  {/* Today , 12.03.2024 18:27 */}
                 </Typography>
               </Box>
 
@@ -224,7 +227,7 @@ function App() {
                       },
                     }}
                   >
-                    <MenuItem sx={styles.menuItem} value="Select a country">
+                    <MenuItem sx={styles.menuItem} value="Select a currency">
                       Select a currency
                     </MenuItem>
                     {countries.map(
@@ -293,7 +296,7 @@ function App() {
                       },
                     }}
                   >
-                    <MenuItem sx={styles.menuItem} value="Select a country">
+                    <MenuItem sx={styles.menuItem} value="Select a currency">
                       Select a currency
                     </MenuItem>
                     {countries.map(
