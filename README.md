@@ -7,7 +7,8 @@ This project is a currency converter application built with React and TypeScript
 ![img1](https://github.com/Santosh-Baliarsingh/currency-converter-app/assets/88627642/68867a8e-f50e-47cf-abca-2d33c4d23f69)
 ![img2](https://github.com/Santosh-Baliarsingh/currency-converter-app/assets/88627642/e887e2cc-9367-4cec-924e-08ca732c94a1)
 ![img3](https://github.com/Santosh-Baliarsingh/currency-converter-app/assets/88627642/1a5f2f7b-19e7-4824-9ae5-055a2e276474)
-![img4](https://github.com/Santosh-Baliarsingh/currency-converter-app/assets/88627642/fda29929-8c1b-4b78-8098-9abc99b743c0)
+![dark](https://github.com/Santosh-Baliarsingh/currency-converter-app/assets/88627642/71c3c83f-7a96-4d43-86a0-557c500c71a2)
+
 
 
 ## Installation
