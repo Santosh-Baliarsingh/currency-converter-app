@@ -75,7 +75,7 @@ function App() {
 
         if (response.data.data[toCurrency] === undefined) {
           setErrorMessage(
-            `The currency ${toCurrency} is not supported by the API. Please select other currencies!`
+            "An error occurred while fetching the currency data."
           );
         } else {
           setErrorMessage("");
@@ -84,7 +84,9 @@ function App() {
         console.log("response", response.data.data[toCurrency]);
         return response.data.data[toCurrency];
       } catch (error) {
-        setErrorMessage("An error occurred while fetching the currency data.");
+        setErrorMessage(
+          `The currency ${toCurrency} is not supported by the API. Please select other currencies!`
+        );
       }
     },
     [apiKey]
